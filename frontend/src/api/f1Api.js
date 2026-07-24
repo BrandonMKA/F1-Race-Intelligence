@@ -2,7 +2,15 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
 async function request(path) {
-  const response = await fetch(`${API_BASE_URL}${path}`);
+  let response;
+
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`);
+  } catch {
+    throw new Error(
+      "The race data service is currently unavailable. Please try again shortly."
+    );
+  }
 
   if (!response.ok) {
     let message = `Request failed with status ${response.status}`;
@@ -14,7 +22,7 @@ async function request(path) {
         message = errorBody.detail;
       }
     } catch {
-      // Keep the fallback error message when no JSON body exists.
+      // Keep the fallback message when the API has no JSON body.
     }
 
     throw new Error(message);

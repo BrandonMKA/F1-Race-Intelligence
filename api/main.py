@@ -37,7 +37,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=get_allowed_origins(),
     allow_credentials=False,
-    allow_methods=["GET"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -47,10 +47,18 @@ app.include_router(events.router)
 app.include_router(analytics.router)
 
 
+FRONTEND_URL = os.getenv("FRONTEND_URL", "")
+
+
 @app.get("/")
 def root() -> dict[str, str]:
-    return {
+    response = {
         "name": "F1 Race Intelligence API",
         "status": "running",
         "documentation": "/docs",
     }
+
+    if FRONTEND_URL:
+        response["frontend"] = FRONTEND_URL
+
+    return response
