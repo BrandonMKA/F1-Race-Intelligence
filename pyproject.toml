@@ -5,9 +5,6 @@ line-length = 88
 line-length = 88
 
 [tool.ruff.lint]
-ignore = ["B008"]
-
-[tool.ruff.lint]
 select = [
     "E",
     "F",
@@ -15,7 +12,6 @@ select = [
     "B",
     "SIM",
 ]
-
 ignore = [
     "B008",
 ]
