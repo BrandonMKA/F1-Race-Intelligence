@@ -58,5 +58,5 @@ export function getStints(eventId) {
 }
 
 export function getLaps(eventId) {
-  return request(`/api/events/${eventId}/laps`);
+  return request(`/api/events/${eventId}/laps?limit=5000`);
 }
