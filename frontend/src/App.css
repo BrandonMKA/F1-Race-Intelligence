@@ -679,3 +679,61 @@ tbody tr:hover {
     display: none;
   }
 }
+
+.race-selector-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.race-selector-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.race-selector-field span {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.race-selector-field select {
+  min-width: 150px;
+  padding: 10px 36px 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.race-selector-field:last-child select {
+  min-width: 260px;
+}
+
+.race-selector-field select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (max-width: 760px) {
+  .site-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .race-selector-group {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .race-selector-field select,
+  .race-selector-field:last-child select {
+    width: 100%;
+    min-width: 0;
+  }
+}

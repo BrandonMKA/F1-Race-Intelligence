@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import logging
 
@@ -16,11 +18,69 @@ logging.basicConfig(
     format="%(asctime)s | %(levelname)s | %(message)s",
 )
 
+logger = logging.getLogger(__name__)
+
+
+def run_pipeline(
+    season: int,
+    event: str | int,
+) -> None:
+    """Extract, transform, validate, and load one F1 race."""
+
+    logger.info(
+        "Starting pipeline for season=%s event=%s",
+        season,
+        event,
+    )
+
+    raw_results, raw_laps, metadata = load_race(
+        season=season,
+        event_name=event,
+    )
+
+    logger.info("Transforming data")
+
+    clean_results = transform_results(
+        results=raw_results,
+        metadata=metadata,
+    )
+
+    clean_laps = transform_laps(
+        laps=raw_laps,
+        metadata=metadata,
+    )
+
+    logger.info("Validating data")
+
+    raise_for_validation_errors(
+        dataset_name="Results",
+        errors=validate_results(clean_results),
+    )
+
+    raise_for_validation_errors(
+        dataset_name="Laps",
+        errors=validate_laps(clean_laps),
+    )
+
+    logger.info("Loading PostgreSQL")
+
+    load_race_to_database(
+        results=clean_results,
+        laps=clean_laps,
+        metadata=metadata,
+    )
+
+    logger.info(
+        "Pipeline completed successfully for %s round %s: %s",
+        metadata["season"],
+        metadata["round_number"],
+        metadata["event_name"],
+    )
+
+
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description=(
-            "Extract, transform, validate and load an F1 race."
-        )
+        description="Extract, transform, validate, and load an F1 race."
     )
 
     parser.add_argument(
@@ -34,7 +94,7 @@ def parse_arguments() -> argparse.Namespace:
         "--event",
         required=True,
         type=str,
-        help='Event identifier, such as "Monza".',
+        help='Event name or round number, such as "Monza" or "16".',
     )
 
     return parser.parse_args()
@@ -43,57 +103,22 @@ def parse_arguments() -> argparse.Namespace:
 def main() -> None:
     args = parse_arguments()
 
+    event: str | int
+
+    if args.event.isdigit():
+        event = int(args.event)
+    else:
+        event = args.event
+
     try:
-
-        logging.info("Extracting FastF1 data")
-
-        raw_results, raw_laps, metadata = load_race(
+        run_pipeline(
             season=args.season,
-            event_name=args.event,
+            event=event,
         )
-
-        logging.info("Transforming data")
-
-        clean_results = transform_results(
-            results=raw_results,
-            metadata=metadata,
-        )
-
-        clean_laps = transform_laps(
-            laps=raw_laps,
-            metadata=metadata,
-        )
-
-        logging.info("Validating data")
-
-        result_errors = validate_results(clean_results)
-        lap_errors = validate_laps(clean_laps)
-
-        raise_for_validation_errors(
-            dataset_name="Results",
-            errors=result_errors,
-        )
-
-        raise_for_validation_errors(
-            dataset_name="Laps",
-            errors=lap_errors,
-        )
-
-        logging.info("Validation passed.")
-
-        logging.info("Loading PostgreSQL")
-
-        load_race_to_database(
-            results=clean_results,
-            laps=clean_laps,
-            metadata=metadata,
-        )
-
-        logging.info("Pipeline completed successfully.")
-
-    except Exception as e:
-        logging.exception("Pipeline failed")
+    except Exception:
+        logger.exception("Pipeline failed")
         raise
+
 
 if __name__ == "__main__":
     main()

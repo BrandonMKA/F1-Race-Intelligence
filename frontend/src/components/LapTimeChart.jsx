@@ -27,17 +27,12 @@ function buildLapChartData(laps, selectedDriverCodes) {
       continue;
     }
 
+    const lapNumber = Number(lap.lap_number);
     const lapTime = Number(lap.lap_time_ms);
 
-    if (!Number.isFinite(lapTime)) {
+    if (!Number.isFinite(lapNumber)) {
       continue;
     }
-
-    if (lap.pit_in || lap.pit_out) {
-      continue;
-    }
-
-    const lapNumber = Number(lap.lap_number);
 
     if (!lapsByNumber.has(lapNumber)) {
       lapsByNumber.set(lapNumber, {
@@ -45,11 +40,23 @@ function buildLapChartData(laps, selectedDriverCodes) {
       });
     }
 
-    lapsByNumber.get(lapNumber)[lap.driver_code] = lapTime;
+    const isValidLapTime =
+      Number.isFinite(lapTime) &&
+      lapTime > 0;
+
+    const isPitLap =
+      Boolean(lap.pit_in) ||
+      Boolean(lap.pit_out);
+
+    lapsByNumber.get(lapNumber)[lap.driver_code] =
+      isValidLapTime && !isPitLap
+        ? lapTime
+        : null;
   }
 
   return [...lapsByNumber.values()].sort(
-    (first, second) => first.lapNumber - second.lapNumber
+    (first, second) =>
+      first.lapNumber - second.lapNumber
   );
 }
 
@@ -58,11 +65,21 @@ function LapTimeTooltip({ active, payload, label }) {
     return null;
   }
 
+  const validEntries = payload.filter(
+    (entry) =>
+      Number.isFinite(Number(entry.value)) &&
+      Number(entry.value) > 0
+  );
+
+  if (validEntries.length === 0) {
+    return null;
+  }
+
   return (
     <div className="chart-tooltip">
       <strong>Lap {label}</strong>
 
-      {payload.map((entry) => (
+      {validEntries.map((entry) => (
         <div key={entry.dataKey} className="tooltip-row">
           <span>{entry.dataKey}</span>
           <span>{formatLapTime(entry.value)}</span>
@@ -77,7 +94,11 @@ export default function LapTimeChart({
   selectedDriverCodes,
 }) {
   const chartData = useMemo(
-    () => buildLapChartData(laps, selectedDriverCodes),
+    () =>
+      buildLapChartData(
+        laps,
+        selectedDriverCodes
+      ),
     [laps, selectedDriverCodes]
   );
 
@@ -133,18 +154,24 @@ export default function LapTimeChart({
               <Tooltip content={<LapTimeTooltip />} />
               <Legend />
 
-              {selectedDriverCodes.map((driverCode, index) => (
-                <Line
-                  key={driverCode}
-                  type="monotone"
-                  dataKey={driverCode}
-                  stroke={chartColors[index % chartColors.length]}
-                  strokeWidth={2}
-                  dot={false}
-                  connectNulls={false}
-                  isAnimationActive={false}
-                />
-              ))}
+              {selectedDriverCodes.map(
+                (driverCode, index) => (
+                  <Line
+                    key={driverCode}
+                    type="monotone"
+                    dataKey={driverCode}
+                    stroke={
+                      chartColors[
+                        index % chartColors.length
+                      ]
+                    }
+                    strokeWidth={2}
+                    dot={false}
+                    connectNulls
+                    isAnimationActive={false}
+                  />
+                )
+              )}
             </LineChart>
           </ResponsiveContainer>
         </div>

@@ -10,7 +10,7 @@ CACHE_DIR = Path("cache")
 
 def load_race(
     season: int,
-    event_name: str,
+    event_name: str | int,
 ) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, Any]]:
     """
     Download a Formula 1 race session.
@@ -31,7 +31,7 @@ def load_race(
         "R",
     )
 
-    print(f"Loading {season} {event_name} Grand Prix...")
+    print(f"Loading {season}, event {event_name}...")
 
     session.load(
         telemetry=False,
