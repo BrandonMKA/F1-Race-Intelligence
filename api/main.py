@@ -5,12 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from api.routers import analytics, events, health
 
-
 app = FastAPI(
     title="F1 Race Intelligence API",
     description=(
-        "REST API providing Formula 1 race results, "
-        "lap data and analytics."
+        "REST API providing Formula 1 race results, " "lap data and analytics."
     ),
     version="1.0.0",
 )
@@ -20,9 +18,7 @@ def get_allowed_origins() -> list[str]:
     configured_origins = os.getenv("ALLOWED_ORIGINS", "")
 
     production_origins = [
-        origin.strip()
-        for origin in configured_origins.split(",")
-        if origin.strip()
+        origin.strip() for origin in configured_origins.split(",") if origin.strip()
     ]
 
     local_origins = [

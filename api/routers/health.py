@@ -3,9 +3,7 @@ from typing import Any
 import psycopg
 from fastapi import APIRouter, Depends, HTTPException, status
 
-
 from api.dependencies import get_database_connection
-
 
 router = APIRouter(
     tags=["Health"],
@@ -14,9 +12,7 @@ router = APIRouter(
 
 @router.get("/health")
 def health_check(
-    connection: psycopg.Connection[dict[str, Any]] = Depends(
-        get_database_connection
-    ),
+    connection: psycopg.Connection[dict[str, Any]] = Depends(get_database_connection),
 ) -> dict[str, str]:
     """
     Confirm that the API and database are available.
@@ -24,19 +20,15 @@ def health_check(
 
     try:
         with connection.cursor() as cursor:
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT
                     current_database() AS database_name;
-                """
-            )
+                """)
 
             row = cursor.fetchone()
 
         if row is None:
-            raise RuntimeError(
-                "Database health query returned no result."
-            )
+            raise RuntimeError("Database health query returned no result.")
 
         return {
             "status": "healthy",

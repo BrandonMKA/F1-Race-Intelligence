@@ -25,15 +25,11 @@ def validate_results(
     ]
 
     missing_columns = [
-        column
-        for column in required_columns
-        if column not in results.columns
+        column for column in required_columns if column not in results.columns
     ]
 
     if missing_columns:
-        errors.append(
-            f"Results table is missing columns: {missing_columns}"
-        )
+        errors.append(f"Results table is missing columns: {missing_columns}")
 
         return errors
 
@@ -50,9 +46,7 @@ def validate_results(
     ).sum()
 
     if duplicate_count > 0:
-        errors.append(
-            f"Results contain {duplicate_count} duplicate driver records."
-        )
+        errors.append(f"Results contain {duplicate_count} duplicate driver records.")
 
     valid_positions = results["finish_position"].dropna()
 
@@ -86,15 +80,11 @@ def validate_laps(
     ]
 
     missing_columns = [
-        column
-        for column in required_columns
-        if column not in laps.columns
+        column for column in required_columns if column not in laps.columns
     ]
 
     if missing_columns:
-        errors.append(
-            f"Laps table is missing columns: {missing_columns}"
-        )
+        errors.append(f"Laps table is missing columns: {missing_columns}")
 
         return errors
 
@@ -125,9 +115,7 @@ def validate_laps(
     ).sum()
 
     if duplicate_count > 0:
-        errors.append(
-            f"Laps contain {duplicate_count} duplicate driver-lap records."
-        )
+        errors.append(f"Laps contain {duplicate_count} duplicate driver-lap records.")
 
     return errors
 
@@ -141,11 +129,6 @@ def raise_for_validation_errors(
     if not errors:
         return
 
-    formatted_errors = "\n".join(
-        f"- {error}"
-        for error in errors
-    )
+    formatted_errors = "\n".join(f"- {error}" for error in errors)
 
-    raise DataValidationError(
-        f"{dataset_name} failed validation:\n{formatted_errors}"
-    )
+    raise DataValidationError(f"{dataset_name} failed validation:\n{formatted_errors}")

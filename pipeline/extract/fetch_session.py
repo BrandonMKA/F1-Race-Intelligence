@@ -4,7 +4,6 @@ from typing import Any
 import fastf1
 import pandas as pd
 
-
 CACHE_DIR = Path("cache")
 
 

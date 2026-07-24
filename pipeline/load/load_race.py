@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Any
 
 import pandas as pd
@@ -101,9 +100,7 @@ def upsert_driver(
         RETURNING driver_id;
         """,
         {
-            "driver_number": to_python_value(
-                result["driver_number"]
-            ),
+            "driver_number": to_python_value(result["driver_number"]),
             "driver_code": result["driver_code"],
             "first_name": to_python_value(result["first_name"]),
             "last_name": to_python_value(result["last_name"]),
@@ -114,9 +111,7 @@ def upsert_driver(
     row = cursor.fetchone()
 
     if row is None:
-        raise RuntimeError(
-            f"Failed to create driver {result['driver_code']}."
-        )
+        raise RuntimeError(f"Failed to create driver {result['driver_code']}.")
 
     return row["driver_id"]
 
@@ -147,9 +142,7 @@ def upsert_constructor(
     row = cursor.fetchone()
 
     if row is None:
-        raise RuntimeError(
-            f"Failed to create constructor {constructor_name}."
-        )
+        raise RuntimeError(f"Failed to create constructor {constructor_name}.")
 
     return row["constructor_id"]
 
@@ -198,12 +191,8 @@ def upsert_result(
             "event_id": event_id,
             "driver_id": driver_id,
             "constructor_id": constructor_id,
-            "grid_position": to_python_value(
-                result["grid_position"]
-            ),
-            "finish_position": to_python_value(
-                result["finish_position"]
-            ),
+            "grid_position": to_python_value(result["grid_position"]),
+            "finish_position": to_python_value(result["finish_position"]),
             "points": to_python_value(result["points"]) or 0,
             "status": to_python_value(result["status"]),
         },
@@ -274,27 +263,15 @@ def upsert_lap(
             "event_id": event_id,
             "driver_id": driver_id,
             "lap_number": to_python_value(lap["lap_number"]),
-            "stint_number": to_python_value(
-                lap["stint_number"]
-            ),
+            "stint_number": to_python_value(lap["stint_number"]),
             "compound": to_python_value(lap["compound"]),
             "tire_life": to_python_value(lap["tire_life"]),
             "position": to_python_value(lap["position"]),
-            "lap_time_ms": to_python_value(
-                lap["lap_time_ms"]
-            ),
-            "sector_1_ms": to_python_value(
-                lap["sector_1_ms"]
-            ),
-            "sector_2_ms": to_python_value(
-                lap["sector_2_ms"]
-            ),
-            "sector_3_ms": to_python_value(
-                lap["sector_3_ms"]
-            ),
-            "is_personal_best": bool(
-                to_python_value(lap["is_personal_best"])
-            ),
+            "lap_time_ms": to_python_value(lap["lap_time_ms"]),
+            "sector_1_ms": to_python_value(lap["sector_1_ms"]),
+            "sector_2_ms": to_python_value(lap["sector_2_ms"]),
+            "sector_3_ms": to_python_value(lap["sector_3_ms"]),
+            "is_personal_best": bool(to_python_value(lap["is_personal_best"])),
             "pit_in": bool(to_python_value(lap["pit_in"])),
             "pit_out": bool(to_python_value(lap["pit_out"])),
         },
@@ -369,63 +346,60 @@ def load_race_to_database(
 ) -> None:
     """Load one transformed race into PostgreSQL."""
 
-    with get_connection() as connection:
-        with connection.cursor() as cursor:
-            pipeline_run_id = start_pipeline_run(
+    with get_connection() as connection, connection.cursor() as cursor:
+        pipeline_run_id = start_pipeline_run(
+            cursor,
+            metadata,
+        )
+
+        event_id = upsert_event(
+            cursor,
+            metadata,
+        )
+
+        driver_ids: dict[str, int] = {}
+
+        for _, result in results.iterrows():
+            driver_id = upsert_driver(cursor, result)
+
+            constructor_id = upsert_constructor(
                 cursor,
-                metadata,
+                to_python_value(result["constructor_name"]),
             )
 
-            event_id = upsert_event(
-                cursor,
-                metadata,
-            )
-
-            driver_ids: dict[str, int] = {}
-
-            for _, result in results.iterrows():
-                driver_id = upsert_driver(cursor, result)
-
-                constructor_id = upsert_constructor(
-                    cursor,
-                    to_python_value(
-                        result["constructor_name"]
-                    ),
-                )
-
-                upsert_result(
-                    cursor=cursor,
-                    event_id=event_id,
-                    driver_id=driver_id,
-                    constructor_id=constructor_id,
-                    result=result,
-                )
-
-                driver_ids[result["driver_code"]] = driver_id
-
-            for _, lap in laps.iterrows():
-                driver_code = lap["driver_code"]
-                driver_id = driver_ids.get(driver_code)
-
-                if driver_id is None:
-                    raise ValueError(
-                        "Lap data contains a driver that is not "
-                        f"in the results table: {driver_code}"
-                    )
-
-                upsert_lap(
-                    cursor=cursor,
-                    event_id=event_id,
-                    driver_id=driver_id,
-                    lap=lap,
-                )
-
-            complete_pipeline_run(
+            upsert_result(
                 cursor=cursor,
-                pipeline_run_id=pipeline_run_id,
-                result_count=len(results),
-                lap_count=len(laps),
+                event_id=event_id,
+                driver_id=driver_id,
+                constructor_id=constructor_id,
+                result=result,
             )
+
+            driver_ids[result["driver_code"]] = driver_id
+
+        for _, lap in laps.iterrows():
+            driver_code = lap["driver_code"]
+            driver_id = driver_ids.get(driver_code)
+
+            if driver_id is None:
+                raise ValueError(
+                    "Lap data contains a driver that is not "
+                    f"in the results table: {driver_code}"
+                )
+
+            upsert_lap(
+                cursor=cursor,
+                event_id=event_id,
+                driver_id=driver_id,
+                lap=lap,
+            )
+
+        complete_pipeline_run(
+            cursor=cursor,
+            pipeline_run_id=pipeline_run_id,
+            result_count=len(results),
+            lap_count=len(laps),
+        )
 
     print("Database load completed successfully.")
     print(f"Results loaded: {len(results):,}")

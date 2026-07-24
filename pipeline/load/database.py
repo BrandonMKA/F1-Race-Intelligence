@@ -6,7 +6,6 @@ import psycopg
 from dotenv import load_dotenv
 from psycopg.rows import dict_row
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 ENV_PATH = PROJECT_ROOT / ".env"
 
@@ -20,8 +19,7 @@ def get_database_url() -> str:
 
     if not database_url:
         raise RuntimeError(
-            "DATABASE_URL is not configured. "
-            "Add it to the project's .env file."
+            "DATABASE_URL is not configured. " "Add it to the project's .env file."
         )
 
     return database_url

@@ -32,10 +32,9 @@ def get_loaded_rounds(season: int) -> set[int]:
         ORDER BY event.round_number;
     """
 
-    with get_connection() as connection:
-        with connection.cursor() as cursor:
-            cursor.execute(query, (season,))
-            rows = cursor.fetchall()
+    with get_connection() as connection, connection.cursor() as cursor:
+        cursor.execute(query, (season,))
+        rows = cursor.fetchall()
 
     return {int(row["round_number"]) for row in rows}
 

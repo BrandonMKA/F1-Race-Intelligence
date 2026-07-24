@@ -2,7 +2,6 @@ from typing import Any
 
 import pandas as pd
 
-
 RESULT_COLUMN_MAP = {
     "DriverNumber": "driver_number",
     "Abbreviation": "driver_code",
@@ -26,21 +25,15 @@ def transform_results(
     """
 
     missing_columns = [
-        column
-        for column in RESULT_COLUMN_MAP
-        if column not in results.columns
+        column for column in RESULT_COLUMN_MAP if column not in results.columns
     ]
 
     if missing_columns:
-        raise ValueError(
-            f"Results data is missing required columns: {missing_columns}"
-        )
+        raise ValueError(f"Results data is missing required columns: {missing_columns}")
 
     clean_results = results[list(RESULT_COLUMN_MAP)].copy()
 
-    clean_results = clean_results.rename(
-        columns=RESULT_COLUMN_MAP
-    )
+    clean_results = clean_results.rename(columns=RESULT_COLUMN_MAP)
 
     clean_results.insert(
         0,
@@ -96,16 +89,9 @@ def transform_results(
     ]
 
     for column in text_columns:
-        clean_results[column] = (
-            clean_results[column]
-            .astype("string")
-            .str.strip()
-        )
+        clean_results[column] = clean_results[column].astype("string").str.strip()
 
-    clean_results["driver_code"] = (
-        clean_results["driver_code"]
-        .str.upper()
-    )
+    clean_results["driver_code"] = clean_results["driver_code"].str.upper()
 
     clean_results = clean_results.drop_duplicates(
         subset=[

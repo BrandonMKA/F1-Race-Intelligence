@@ -9,7 +9,6 @@ from pipeline.transform.validate import (
     validate_results,
 )
 
-
 PROCESSED_DATA_DIR = Path("data/processed")
 
 
@@ -49,15 +48,9 @@ def main() -> None:
         errors=lap_errors,
     )
 
-    results_path = (
-        PROCESSED_DATA_DIR
-        / "2025_monza_results.csv"
-    )
+    results_path = PROCESSED_DATA_DIR / "2025_monza_results.csv"
 
-    laps_path = (
-        PROCESSED_DATA_DIR
-        / "2025_monza_laps.csv"
-    )
+    laps_path = PROCESSED_DATA_DIR / "2025_monza_laps.csv"
 
     clean_results.to_csv(
         results_path,
@@ -71,15 +64,9 @@ def main() -> None:
 
     print("\nTransformation completed successfully.")
 
-    print(
-        f"Results: {len(clean_results):,} rows "
-        f"saved to {results_path}"
-    )
+    print(f"Results: {len(clean_results):,} rows " f"saved to {results_path}")
 
-    print(
-        f"Laps: {len(clean_laps):,} rows "
-        f"saved to {laps_path}"
-    )
+    print(f"Laps: {len(clean_laps):,} rows " f"saved to {laps_path}")
 
     print("\nClean results preview:")
     print(clean_results.head().to_string(index=False))
@@ -91,8 +78,7 @@ def main() -> None:
     print(clean_laps.dtypes)
 
     fastest_laps = (
-        clean_laps
-        .dropna(subset=["lap_time_ms"])
+        clean_laps.dropna(subset=["lap_time_ms"])
         .sort_values("lap_time_ms")
         .loc[
             :,
@@ -110,8 +96,7 @@ def main() -> None:
     print(fastest_laps.to_string(index=False))
 
     average_driver_pace = (
-        clean_laps
-        .dropna(subset=["lap_time_ms"])
+        clean_laps.dropna(subset=["lap_time_ms"])
         .groupby("driver_code", as_index=False)
         .agg(
             average_lap_time_ms=(

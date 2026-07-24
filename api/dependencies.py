@@ -6,8 +6,7 @@ import psycopg
 from pipeline.load.database import get_connection
 
 
-def get_database_connection(
-) -> Generator[
+def get_database_connection() -> Generator[
     psycopg.Connection[dict[str, Any]],
     None,
     None,

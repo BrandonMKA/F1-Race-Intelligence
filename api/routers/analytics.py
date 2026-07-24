@@ -11,11 +11,11 @@ from api.schemas.analytics import (
     StintSummary,
 )
 
-
 router = APIRouter(
     prefix="/api/analytics",
     tags=["Analytics"],
 )
+
 
 @router.get(
     "/events/{event_id}/fastest-laps",
@@ -29,9 +29,7 @@ def get_fastest_laps(
         le=20,
         description="Number of drivers to return.",
     ),
-    connection: psycopg.Connection[dict[str, Any]] = Depends(
-        get_database_connection
-    ),
+    connection: psycopg.Connection[dict[str, Any]] = Depends(get_database_connection),
 ) -> list[dict[str, Any]]:
     """
     Return each driver's fastest valid lap, ordered fastest first.
@@ -94,15 +92,14 @@ def get_fastest_laps(
 
     return rows
 
+
 @router.get(
     "/events/{event_id}/position-gains",
     response_model=list[PositionGain],
 )
 def get_position_gains(
     event_id: int,
-    connection: psycopg.Connection[dict[str, Any]] = Depends(
-        get_database_connection
-    ),
+    connection: psycopg.Connection[dict[str, Any]] = Depends(get_database_connection),
 ) -> list[dict[str, Any]]:
     """
     Compare each driver's starting and finishing positions.
@@ -148,15 +145,14 @@ def get_position_gains(
 
     return rows
 
+
 @router.get(
     "/events/{event_id}/constructors",
     response_model=list[ConstructorPerformance],
 )
 def get_constructor_performance(
     event_id: int,
-    connection: psycopg.Connection[dict[str, Any]] = Depends(
-        get_database_connection
-    ),
+    connection: psycopg.Connection[dict[str, Any]] = Depends(get_database_connection),
 ) -> list[dict[str, Any]]:
     """
     Summarize constructor results for one event.
@@ -200,6 +196,7 @@ def get_constructor_performance(
 
     return rows
 
+
 @router.get(
     "/events/{event_id}/stints",
     response_model=list[StintSummary],
@@ -212,9 +209,7 @@ def get_stint_summaries(
         max_length=3,
         description="Optionally filter by driver code.",
     ),
-    connection: psycopg.Connection[dict[str, Any]] = Depends(
-        get_database_connection
-    ),
+    connection: psycopg.Connection[dict[str, Any]] = Depends(get_database_connection),
 ) -> list[dict[str, Any]]:
     """
     Summarize each driver's tire stints and lap pace.
@@ -279,6 +274,7 @@ def get_stint_summaries(
         rows = cursor.fetchall()
 
     return rows
+
 
 def verify_event_exists(
     connection: psycopg.Connection[dict[str, Any]],

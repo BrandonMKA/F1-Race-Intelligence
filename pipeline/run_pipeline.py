@@ -105,10 +105,7 @@ def main() -> None:
 
     event: str | int
 
-    if args.event.isdigit():
-        event = int(args.event)
-    else:
-        event = args.event
+    event = int(args.event) if args.event.isdigit() else args.event
 
     try:
         run_pipeline(

@@ -2,18 +2,15 @@ from pipeline.load.database import get_connection
 
 
 def main() -> None:
-    with get_connection() as connection:
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """
+    with get_connection() as connection, connection.cursor() as cursor:
+        cursor.execute("""
                 SELECT
                     current_database() AS database_name,
                     current_user AS database_user,
                     version() AS postgres_version;
-                """
-            )
+                """)
 
-            row = cursor.fetchone()
+        row = cursor.fetchone()
 
     if row is None:
         raise RuntimeError("The connection test returned no data.")

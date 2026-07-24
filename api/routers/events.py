@@ -3,12 +3,10 @@ from typing import Any
 import psycopg
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-
 from api.dependencies import get_database_connection
 from api.schemas.event import EventDetail, EventSummary
 from api.schemas.lap import Lap
 from api.schemas.result import RaceResult
-
 
 router = APIRouter(
     prefix="/api/events",
@@ -27,9 +25,7 @@ def list_events(
         le=2100,
         description="Optionally filter events by season.",
     ),
-    connection: psycopg.Connection[dict[str, Any]] = Depends(
-        get_database_connection
-    ),
+    connection: psycopg.Connection[dict[str, Any]] = Depends(get_database_connection),
 ) -> list[dict[str, Any]]:
     """
     Return all loaded F1 events.
@@ -76,9 +72,7 @@ def list_events(
 )
 def get_event(
     event_id: int,
-    connection: psycopg.Connection[dict[str, Any]] = Depends(
-        get_database_connection
-    ),
+    connection: psycopg.Connection[dict[str, Any]] = Depends(get_database_connection),
 ) -> dict[str, Any]:
     """
     Return one event and its related row counts.
@@ -127,9 +121,7 @@ def get_event(
 )
 def get_event_results(
     event_id: int,
-    connection: psycopg.Connection[dict[str, Any]] = Depends(
-        get_database_connection
-    ),
+    connection: psycopg.Connection[dict[str, Any]] = Depends(get_database_connection),
 ) -> list[dict[str, Any]]:
     """
     Return race results for one event.
@@ -198,9 +190,7 @@ def get_event_laps(
         ge=0,
         description="Number of lap rows to skip.",
     ),
-    connection: psycopg.Connection[dict[str, Any]] = Depends(
-        get_database_connection
-    ),
+    connection: psycopg.Connection[dict[str, Any]] = Depends(get_database_connection),
 ) -> list[dict[str, Any]]:
     """
     Return lap data for an event.

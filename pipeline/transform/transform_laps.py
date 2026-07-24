@@ -2,7 +2,6 @@ from typing import Any
 
 import pandas as pd
 
-
 LAP_COLUMN_MAP = {
     "Driver": "driver_code",
     "DriverNumber": "driver_number",
@@ -42,21 +41,15 @@ def transform_laps(
     """
 
     missing_columns = [
-        column
-        for column in LAP_COLUMN_MAP
-        if column not in laps.columns
+        column for column in LAP_COLUMN_MAP if column not in laps.columns
     ]
 
     if missing_columns:
-        raise ValueError(
-            f"Lap data is missing required columns: {missing_columns}"
-        )
+        raise ValueError(f"Lap data is missing required columns: {missing_columns}")
 
     clean_laps = laps[list(LAP_COLUMN_MAP)].copy()
 
-    clean_laps = clean_laps.rename(
-        columns=LAP_COLUMN_MAP
-    )
+    clean_laps = clean_laps.rename(columns=LAP_COLUMN_MAP)
 
     clean_laps.insert(
         0,
@@ -83,10 +76,7 @@ def transform_laps(
     )
 
     clean_laps["driver_code"] = (
-        clean_laps["driver_code"]
-        .astype("string")
-        .str.strip()
-        .str.upper()
+        clean_laps["driver_code"].astype("string").str.strip().str.upper()
     )
 
     integer_columns = [
@@ -103,33 +93,20 @@ def transform_laps(
             errors="coerce",
         ).astype("Int64")
 
-    clean_laps["lap_time_ms"] = timedelta_to_milliseconds(
-        clean_laps["lap_time"]
-    )
+    clean_laps["lap_time_ms"] = timedelta_to_milliseconds(clean_laps["lap_time"])
 
-    clean_laps["sector_1_ms"] = timedelta_to_milliseconds(
-        clean_laps["sector_1_time"]
-    )
+    clean_laps["sector_1_ms"] = timedelta_to_milliseconds(clean_laps["sector_1_time"])
 
-    clean_laps["sector_2_ms"] = timedelta_to_milliseconds(
-        clean_laps["sector_2_time"]
-    )
+    clean_laps["sector_2_ms"] = timedelta_to_milliseconds(clean_laps["sector_2_time"])
 
-    clean_laps["sector_3_ms"] = timedelta_to_milliseconds(
-        clean_laps["sector_3_time"]
-    )
+    clean_laps["sector_3_ms"] = timedelta_to_milliseconds(clean_laps["sector_3_time"])
 
     clean_laps["compound"] = (
-        clean_laps["compound"]
-        .astype("string")
-        .str.strip()
-        .str.upper()
+        clean_laps["compound"].astype("string").str.strip().str.upper()
     )
 
     clean_laps["is_personal_best"] = (
-        clean_laps["is_personal_best"]
-        .fillna(False)
-        .astype(bool)
+        clean_laps["is_personal_best"].fillna(False).astype(bool)
     )
 
     clean_laps["pit_in"] = clean_laps["pit_in_time"].notna()
