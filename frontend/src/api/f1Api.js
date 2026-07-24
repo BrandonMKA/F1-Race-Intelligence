@@ -56,3 +56,7 @@ export function getConstructors(eventId) {
 export function getStints(eventId) {
   return request(`/api/analytics/events/${eventId}/stints`);
 }
+
+export function getLaps(eventId) {
+  return request(`/api/events/${eventId}/laps`);
+}

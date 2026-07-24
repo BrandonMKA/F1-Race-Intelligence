@@ -4,6 +4,7 @@ import {
   getConstructors,
   getEvent,
   getFastestLaps,
+  getLaps,
   getPositionGains,
   getResults,
   getStints,
@@ -16,6 +17,7 @@ const initialData = {
   positionGains: [],
   constructors: [],
   stints: [],
+  laps: [],
 };
 
 export function useEventData(eventId) {
@@ -40,6 +42,7 @@ export function useEventData(eventId) {
           event,
           results,
           fastestLaps,
+          laps,
           positionGains,
           constructors,
           stints,
@@ -47,6 +50,7 @@ export function useEventData(eventId) {
           getEvent(eventId),
           getResults(eventId),
           getFastestLaps(eventId),
+          getLaps(eventId),
           getPositionGains(eventId),
           getConstructors(eventId),
           getStints(eventId),
@@ -57,6 +61,7 @@ export function useEventData(eventId) {
             event,
             results,
             fastestLaps,
+            laps,
             positionGains,
             constructors,
             stints,

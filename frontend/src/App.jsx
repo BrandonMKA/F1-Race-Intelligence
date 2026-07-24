@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { getEvents } from "./api/f1Api";
 import ConstructorTable from "./components/ConstructorTable";
@@ -10,18 +10,25 @@ import PositionGainsTable from "./components/PositionGainsTable";
 import ResultsTable from "./components/ResultsTable";
 import StintsTable from "./components/StintsTable";
 import { useEventData } from "./hooks/useEventData";
+import DriverSelector from "./components/DriverSelector";
+import LapTimeChart from "./components/LapTimeChart";
+import PositionGainChart from "./components/PositionGainChart";
+import RacePositionChart from "./components/RacePositionChart";
+import StintStrategyChart from "./components/StintStrategyChart";
 
 import "./App.css";
 
 function App() {
   const [events, setEvents] = useState([]);
   const [selectedEventId, setSelectedEventId] = useState("");
+  const [selectedDriverCodes, setSelectedDriverCodes] = useState([]);
   const [eventsLoading, setEventsLoading] = useState(true);
   const [eventsError, setEventsError] = useState("");
 
   const {
     event,
     results,
+    laps,
     fastestLaps,
     positionGains,
     constructors,
@@ -29,6 +36,19 @@ function App() {
     isLoading,
     error,
   } = useEventData(selectedEventId);
+
+  const availableDrivers = useMemo(
+  () =>
+    results
+      .filter((result) => result.driver_code)
+      .map((result) => ({
+        driver_id: result.driver_id,
+        driver_code: result.driver_code,
+        full_name: result.full_name,
+        constructor_name: result.constructor_name,
+      })),
+  [results]
+);
 
   useEffect(() => {
     async function loadEvents() {
@@ -53,6 +73,34 @@ function App() {
 
     loadEvents();
   }, []);
+
+  useEffect(() => {
+    if (results.length === 0) {
+      setSelectedDriverCodes([]);
+      return;
+    }
+
+    setSelectedDriverCodes(
+      results
+        .filter((result) => result.driver_code)
+        .slice(0, 2)
+        .map((result) => result.driver_code)
+    );
+  }, [selectedEventId, results]);
+
+  function toggleDriver(driverCode) {
+    setSelectedDriverCodes((current) => {
+      if (current.includes(driverCode)) {
+        return current.filter((code) => code !== driverCode);
+      }
+
+      if (current.length >= 4) {
+        return current;
+      }
+
+      return [...current, driverCode];
+    });
+  }
 
   return (
     <div className="app-shell">
@@ -103,12 +151,38 @@ function App() {
         {!isLoading && !error && event && (
           <>
             <EventHeader event={event} />
+            <DriverSelector
+              drivers={availableDrivers}
+              selectedDriverCodes={selectedDriverCodes}
+              onToggle={toggleDriver}
+            />
 
             <div className="dashboard-grid">
-              <ResultsTable results={results} />
-              <FastestLapsTable laps={fastestLaps} />
-              <PositionGainsTable drivers={positionGains} />
+              <LapTimeChart
+                laps={laps}
+                selectedDriverCodes={selectedDriverCodes}
+              />
+
+              <RacePositionChart
+                laps={laps}
+                selectedDriverCodes={selectedDriverCodes}
+              />
+
+              <StintStrategyChart
+                stints={stints}
+                selectedDriverCodes={selectedDriverCodes}
+              />
+
+              <PositionGainChart drivers={positionGains} />
+
               <ConstructorTable constructors={constructors} />
+
+              <ResultsTable results={results} />
+
+              <FastestLapsTable laps={fastestLaps} />
+
+              <PositionGainsTable drivers={positionGains} />
+
               <StintsTable stints={stints} />
             </div>
           </>
