@@ -1,0 +1,261 @@
+# 🏎️ F1 Race Intelligence
+
+A production-style data engineering project that extracts, transforms, validates, and loads Formula 1 race data into a cloud-hosted PostgreSQL database for analytics and visualization.
+
+This project demonstrates modern data engineering practices including ETL pipelines, relational database design, cloud databases, automated validation, and API-ready architecture.
+
+---
+
+## 🚀 Features
+
+- Extracts official Formula 1 session data using the FastF1 API
+- Cleans and transforms raw race and lap telemetry
+- Validates datasets before loading
+- Loads data into a normalized PostgreSQL database
+- Uses UPSERT operations to prevent duplicate records
+- Tracks every pipeline execution
+- Supports cloud deployment using Neon PostgreSQL
+- Built with scalability in mind for future API and dashboard integration
+
+---
+
+## 🏗️ Architecture
+
+```
+             FastF1 API
+                  │
+                  ▼
+        Extract Raw Data
+                  │
+                  ▼
+      Transform & Clean Data
+                  │
+                  ▼
+       Validate Data Quality
+                  │
+                  ▼
+      Load into PostgreSQL
+                  │
+                  ▼
+          Future FastAPI
+                  │
+                  ▼
+         Future React Dashboard
+```
+
+---
+
+## 📂 Project Structure
+
+```
+F1-Race-Intelligence
+│
+├── database/
+│   ├── schema.sql
+│   ├── indexes.sql
+│   └── test_connection.py
+│
+├── pipeline/
+│   ├── extract/
+│   ├── transform/
+│   ├── load/
+│   └── run_pipeline.py
+│
+├── tests/
+│
+├── requirements.txt
+├── requirements-lock.txt
+├── .env.example
+└── README.md
+```
+
+---
+
+## 🛠️ Tech Stack
+
+### Languages
+
+- Python
+- SQL
+
+### Database
+
+- PostgreSQL
+- Neon (Cloud PostgreSQL)
+
+### Libraries
+
+- FastF1
+- Pandas
+- Psycopg3
+- python-dotenv
+
+### Testing
+
+- Pytest
+
+### Version Control
+
+- Git
+- GitHub
+
+---
+
+## 🗄️ Database Design
+
+The project uses a normalized relational schema.
+
+### Dimension Tables
+
+- `dim_event`
+- `dim_driver`
+- `dim_constructor`
+
+### Fact Tables
+
+- `fact_result`
+- `fact_lap`
+
+### Operational Tables
+
+- `pipeline_run`
+
+This design minimizes redundancy while allowing efficient analytical queries.
+
+---
+
+## 🔄 ETL Pipeline
+
+The pipeline consists of four stages.
+
+### 1. Extract
+
+Downloads race results and lap telemetry from FastF1.
+
+### 2. Transform
+
+Standardizes data by:
+
+- Cleaning column names
+- Converting lap times to milliseconds
+- Handling missing values
+- Normalizing driver and constructor information
+- Formatting metadata
+
+### 3. Validate
+
+Performs automated quality checks before data reaches the database.
+
+Examples include:
+
+- Missing values
+- Invalid lap numbers
+- Duplicate records
+- Invalid race metadata
+
+### 4. Load
+
+Loads transformed data into PostgreSQL using UPSERT operations.
+
+Features include:
+
+- Idempotent loads
+- Foreign key relationships
+- Pipeline execution tracking
+- Transaction safety
+
+---
+
+## ▶️ Running the Pipeline
+
+Run a race by specifying the season and event name.
+
+```bash
+python -m pipeline.run_pipeline --season 2025 --event Monza
+```
+
+Example:
+
+```bash
+python -m pipeline.run_pipeline --season 2024 --event Bahrain
+```
+
+---
+
+## ⚙️ Environment Variables
+
+Create a `.env` file in the project root.
+
+```env
+DATABASE_URL=your_postgresql_connection_string
+```
+
+Example:
+
+```env
+DATABASE_URL=postgresql://username:password@host/database
+```
+
+---
+
+## 🧪 Running Tests
+
+Execute all tests with:
+
+```bash
+pytest
+```
+
+---
+
+## 📈 Future Enhancements
+
+Planned improvements include:
+
+- FastAPI backend
+- REST API endpoints
+- Interactive React dashboard
+- GitHub Actions CI/CD
+- Docker support
+- Incremental pipeline scheduling
+- Historical multi-season ingestion
+- Advanced driver and constructor analytics
+
+---
+
+## 📚 What I Learned
+
+Through this project I gained practical experience with:
+
+- Designing normalized relational databases
+- Building production-style ETL pipelines
+- Data validation strategies
+- PostgreSQL and SQL optimization
+- Cloud-hosted databases
+- Python package organization
+- Writing maintainable and testable code
+- Version control with Git
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 📸 Screenshots
+
+### Pipeline Execution
+
+*(Coming Soon)*
+
+### Database Schema
+
+*(Coming Soon)*
+
+### API Documentation
+
+*(Coming Soon)*
+
+### Dashboard
+
+*(Coming Soon)*

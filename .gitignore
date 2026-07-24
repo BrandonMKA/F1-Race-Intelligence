@@ -1,0 +1,21 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Environment variables
+.env
+
+# FastF1 downloaded cache
+cache/
+
+# Generated data
+data/raw/
+data/processed/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
