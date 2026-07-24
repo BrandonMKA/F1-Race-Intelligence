@@ -1,0 +1,12 @@
+html {
+  color-scheme: dark;
+  background: #0b0d10;
+}
+
+body {
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+}
