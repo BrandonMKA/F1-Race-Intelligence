@@ -94,7 +94,7 @@ def get_event(
                     WHERE fact_result.event_id = event.event_id
                 ) AS result_count,
                 (
-                    SELECT COUNT(*)
+                    SELECT COALESCE(MAX(fact_lap.lap_number), 0)
                     FROM fact_lap
                     WHERE fact_lap.event_id = event.event_id
                 ) AS lap_count
