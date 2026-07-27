@@ -17,11 +17,13 @@ logger = logging.getLogger(__name__)
 def update_season(season: int | None = None) -> None:
     """Load completed races missing from the selected or current season."""
 
-    target_season = season or datetime.now(timezone.utc).year
+    now = datetime.now(timezone.utc)
+    target_season = season or now.year
 
     logger.info(
-        "Checking season %s for newly completed races.",
+        "Starting race-data update for season %s at %s.",
         target_season,
+        now.isoformat(),
     )
 
     backfill_season(
@@ -29,9 +31,16 @@ def update_season(season: int | None = None) -> None:
         force=False,
     )
 
+    logger.info(
+        "Finished race-data update for season %s.",
+        target_season,
+    )
+
 
 def parse_arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Ingest newly completed F1 races.")
+    parser = argparse.ArgumentParser(
+        description="Ingest newly completed F1 races."
+    )
 
     parser.add_argument(
         "--season",
@@ -44,4 +53,9 @@ def parse_arguments() -> argparse.Namespace:
 
 if __name__ == "__main__":
     args = parse_arguments()
-    update_season(args.season)
+
+    try:
+        update_season(args.season)
+    except Exception:
+        logger.exception("Race-data update failed.")
+        raise

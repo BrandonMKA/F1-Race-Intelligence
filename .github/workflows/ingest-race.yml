@@ -2,8 +2,8 @@ name: Update Formula 1 Race Data
 
 on:
   schedule:
-    # Runs every day at 12:00 UTC. Existing races are skipped.
-    - cron: "0 12 * * *"
+    # Runs every day at 12:17 UTC. Existing races are skipped.
+    - cron: "17 12 * * *"
 
   workflow_dispatch:
     inputs:
