@@ -38,9 +38,7 @@ def update_season(season: int | None = None) -> None:
 
 
 def parse_arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Ingest newly completed F1 races."
-    )
+    parser = argparse.ArgumentParser(description="Ingest newly completed F1 races.")
 
     parser.add_argument(
         "--season",
